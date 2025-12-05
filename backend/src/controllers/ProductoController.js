@@ -18,7 +18,7 @@ const productoControlador = {
       res.status(500).json({ mensaje: 'Error al crear producto', error });
     }
   },
-s
+
   // Opcional: obtener producto por ID
   obtenerPorId: async (req, res) => {
     try {

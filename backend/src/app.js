@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { sequelize } = require('./models'); // modelos con Sequelize
 const productRoutes = require('./routes/productRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,10 @@ app.use('/api/products', productRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.send('🚀 Servidor Smartventory funcionando correctamente'));
+
+
+app.use('/api/users', userRoutes);
+
 
 // Verificar conexión a la base de datos
 sequelize.authenticate()
