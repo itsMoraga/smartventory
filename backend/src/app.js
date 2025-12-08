@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 const { sequelize } = require('./models'); // modelos con Sequelize
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const photoRoutes = require('./routes/photoRoutes');
+const path = require('path');
 
 dotenv.config();
 const app = express();
@@ -12,8 +15,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Servir carpeta uploads estáticamente
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Rutas
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/photos', photoRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.send('🚀 Servidor Smartventory funcionando correctamente'));
