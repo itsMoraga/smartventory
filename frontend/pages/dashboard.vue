@@ -14,14 +14,15 @@
         <NuxtLink to="/productos" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer block">
           <h3 class="text-lg font-medium text-gray-900">Productos</h3>
           <p class="mt-2 text-3xl font-bold text-blue-600">12</p>
-          <p class="text-gray-500 text-sm">Gestionar inventario →</p>
+          <p class="text-gray-500 text-sm">Gestionar inventario 2</p>
         </NuxtLink>
-        
-        <div class="bg-white p-6 rounded-lg shadow">
+
+        <!-- Tarjeta de Categorías con acceso -->
+        <NuxtLink to="/categorias" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer block">
           <h3 class="text-lg font-medium text-gray-900">Categorías</h3>
           <p class="mt-2 text-3xl font-bold text-green-600">5</p>
-          <p class="text-gray-500 text-sm">Categorías activas</p>
-        </div>
+          <p class="text-gray-500 text-sm">Gestionar categorías →</p>
+        </NuxtLink>
 
         <div class="bg-white p-6 rounded-lg shadow">
           <h3 class="text-lg font-medium text-gray-900">Usuarios</h3>

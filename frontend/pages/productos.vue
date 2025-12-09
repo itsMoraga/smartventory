@@ -17,6 +17,15 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 pb-10">
+      <!-- Filtro por categoría -->
+      <div class="mb-6 max-w-xs">
+        <CategoriaSelect 
+          v-if="categorias.length > 0"
+          :categorias="categorias" 
+          v-model="categoriaSeleccionada"
+        />
+      </div>
+
       <!-- Loading State -->
       <div v-if="pending" class="text-center py-10">
         <p class="text-gray-500">Cargando productos...</p>
@@ -28,7 +37,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="productos.length === 0" class="text-center py-10 bg-white rounded-lg shadow">
+      <div v-else-if="productosFiltrados.length === 0" class="text-center py-10 bg-white rounded-lg shadow">
         <p class="text-gray-500 mb-4">No hay productos registrados</p>
         <button @click="abrirModalCrear" class="text-blue-600 hover:underline">Crear el primero</button>
       </div>
@@ -36,7 +45,7 @@
       <!-- Grid de Productos -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <ProductoCard 
-          v-for="prod in productos" 
+          v-for="prod in productosFiltrados" 
           :key="prod.id_producto" 
           :producto="prod"
           @editar="abrirModalEditar"
@@ -56,12 +65,26 @@
 </template>
 
 <script setup>
+import CategoriaSelect from '~/components/CategoriaSelect.vue'
+
 const mostrarModal = ref(false)
 const productoSeleccionado = ref(null)
 
 // Fetch de productos
 const { data: productos, pending, error, refresh } = await useFetch('http://localhost:4000/api/products', {
   default: () => []
+})
+
+// Fetch de categorías para el filtro
+const { data: categorias = [] } = await useFetch('http://localhost:4000/api/categories', {
+  default: () => []
+})
+
+const categoriaSeleccionada = ref(null)
+
+const productosFiltrados = computed(() => {
+  if (!categoriaSeleccionada.value) return productos.value
+  return productos.value.filter(p => p.id_categoria === categoriaSeleccionada.value)
 })
 
 const abrirModalCrear = () => {
