@@ -10,12 +10,12 @@
     <main class="max-w-7xl mx-auto py-10 px-4">
       <h2 class="text-2xl font-semibold mb-4">Panel de Control</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Tarjeta de ejemplo -->
-        <div class="bg-white p-6 rounded-lg shadow">
+        <!-- Tarjeta de Productos -->
+        <NuxtLink to="/productos" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer block">
           <h3 class="text-lg font-medium text-gray-900">Productos</h3>
           <p class="mt-2 text-3xl font-bold text-blue-600">12</p>
-          <p class="text-gray-500 text-sm">Total en inventario</p>
-        </div>
+          <p class="text-gray-500 text-sm">Gestionar inventario →</p>
+        </NuxtLink>
         
         <div class="bg-white p-6 rounded-lg shadow">
           <h3 class="text-lg font-medium text-gray-900">Categorías</h3>
