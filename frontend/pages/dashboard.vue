@@ -1,39 +1,53 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow p-4">
-      <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <h1 class="text-xl font-bold text-blue-600">Smartventory</h1>
-        <button @click="logout" class="text-gray-600 hover:text-red-500">Cerrar Sesión</button>
-      </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto py-10 px-4">
-      <h2 class="text-2xl font-semibold mb-4">Panel de Control</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Tarjeta de Productos -->
-        <NuxtLink to="/productos" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer block relative">
-          <h3 class="text-lg font-medium text-gray-900">Productos</h3>
-          <p class="mt-2 text-3xl font-bold text-blue-600">{{ totalProductos }}</p>
-          <p class="text-gray-500 text-sm">Gestionar inventario →</p>
-          <div v-if="stockBajo > 0" class="absolute top-4 right-4 flex items-center bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-            ⚠️ {{ stockBajo }} con stock bajo
+  <div>
+    <h2 class="text-3xl font-bold text-gray-800 mb-8">Panel de Control</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Tarjeta de Productos -->
+      <NuxtLink to="/productos" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer block relative group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Productos</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">{{ totalProductos }}</h3>
           </div>
-        </NuxtLink>
-
-        <!-- Tarjeta de Categorías con acceso -->
-        <NuxtLink to="/categorias" class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer block">
-          <h3 class="text-lg font-medium text-gray-900">Categorías</h3>
-          <p class="mt-2 text-3xl font-bold text-green-600">5</p>
-          <p class="text-gray-500 text-sm">Gestionar categorías →</p>
-        </NuxtLink>
-
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h3 class="text-lg font-medium text-gray-900">Usuarios</h3>
-          <p class="mt-2 text-3xl font-bold text-purple-600">3</p>
-          <p class="text-gray-500 text-sm">Usuarios registrados</p>
+          <span class="p-3 rounded-lg bg-blue-50 text-blue-600 text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">📦</span>
         </div>
+        <p class="mt-4 text-sm text-gray-500 flex items-center">
+          <span>Gestionar inventario</span>
+          <span class="ml-1">→</span>
+        </p>
+        <div v-if="stockBajo > 0" class="absolute top-4 right-4 flex items-center bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+          ⚠️ {{ stockBajo }} stock bajo
+        </div>
+      </NuxtLink>
+
+      <!-- Tarjeta de Categorías -->
+      <NuxtLink to="/categorias" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer block group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Categorías</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">5</h3>
+          </div>
+          <span class="p-3 rounded-lg bg-green-50 text-green-600 text-xl group-hover:bg-green-600 group-hover:text-white transition-colors">🏷️</span>
+        </div>
+        <p class="mt-4 text-sm text-gray-500 flex items-center">
+          <span>Gestionar categorías</span>
+          <span class="ml-1">→</span>
+        </p>
+      </NuxtLink>
+
+      <!-- Tarjeta de Usuarios -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Usuarios</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2">3</h3>
+          </div>
+          <span class="p-3 rounded-lg bg-purple-50 text-purple-600 text-xl">👥</span>
+        </div>
+        <p class="mt-4 text-sm text-gray-500">Usuarios registrados</p>
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
@@ -48,13 +62,6 @@ if (!localStorage.getItem('token')) {
 
 const totalProductos = ref(0)
 const stockBajo = ref(0)
-
-const logout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('rol')
-  localStorage.removeItem('usuario')
-  router.push('/login')
-}
 
 onMounted(async () => {
   try {
