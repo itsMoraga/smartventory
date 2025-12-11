@@ -131,9 +131,13 @@ const handleSubmit = async () => {
     
     const method = props.producto?.id_producto ? 'PUT' : 'POST'
 
+    const token = localStorage.getItem('token')
     await $fetch(url, {
       method,
-      body: form.value
+      body: form.value,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 
     emit('saved')

@@ -8,6 +8,7 @@
           <h1 class="text-xl font-bold text-gray-800">Gestión de Productos</h1>
         </div>
         <button 
+          v-if="rol === 'admin' || rol === 'operador'"
           @click="abrirModalCrear"
           class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
         >
@@ -96,6 +97,7 @@
 </template>
 
 <script setup>
+const rol = ref(localStorage.getItem('rol'))
 import CategoriaSelect from '~/components/CategoriaSelect.vue'
 
 const mostrarModal = ref(false)
@@ -209,8 +211,12 @@ const eliminarProducto = async (id) => {
   if (!confirm('¿Estás seguro de eliminar este producto?')) return
 
   try {
+    const token = localStorage.getItem('token')
     await $fetch(`http://localhost:4000/api/products/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     refresh() // Recargar lista
   } catch (e) {

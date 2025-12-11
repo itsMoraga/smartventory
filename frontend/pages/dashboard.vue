@@ -41,12 +41,19 @@
 import { ref, onMounted } from 'vue'
 const router = useRouter()
 
+// Proteger acceso: redirigir si no hay token
+if (!localStorage.getItem('token')) {
+  router.push('/login')
+}
+
 const totalProductos = ref(0)
 const stockBajo = ref(0)
 
 const logout = () => {
-  // Aquí limpiaremos el estado del usuario luego
-  router.push('/')
+  localStorage.removeItem('token')
+  localStorage.removeItem('rol')
+  localStorage.removeItem('usuario')
+  router.push('/login')
 }
 
 onMounted(async () => {

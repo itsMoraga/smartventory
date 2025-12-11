@@ -21,6 +21,7 @@
 
         <div class="flex space-x-2">
           <button 
+            v-if="rol === 'admin' || rol === 'operador'"
             @click="$emit('editar', producto)" 
             class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
             title="Editar"
@@ -28,6 +29,7 @@
             ✏️
           </button>
           <button 
+            v-if="rol === 'admin'"
             @click="$emit('eliminar', producto.id_producto)" 
             class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
             title="Eliminar"
@@ -66,6 +68,7 @@
 </template>
 
 <script setup>
+const rol = localStorage.getItem('rol')
 import { ref } from 'vue'
 import HistorialMovimientos from './HistorialMovimientos.vue'
 import MovimientoForm from './MovimientoForm.vue'
