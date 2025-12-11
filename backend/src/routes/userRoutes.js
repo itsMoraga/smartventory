@@ -7,12 +7,17 @@ const { requireRole, authenticateJWT } = require('../middleware/authMiddleware')
 router.post('/register', usuarioController.registrar);
 router.post('/login', usuarioController.login);
 
-// Rutas protegidas (o públicas si estás probando sin token aún)
-router.get('/', usuarioController.listar);
-router.get('/:id', usuarioController.obtenerPorId); // Esta es la que te daba error 404
-router.put('/:id', usuarioController.actualizar);
-// Solo admin puede eliminar usuarios
+// Rutas protegidas
+// Listar usuarios: Solo admin
+router.get('/', authenticateJWT, requireRole(['admin']), usuarioController.listar);
+
+// Obtener usuario por ID: Admin
+router.get('/:id', authenticateJWT, requireRole(['admin']), usuarioController.obtenerPorId);
+
+// Actualizar usuario: Solo admin
 router.put('/:id', authenticateJWT, requireRole(['admin']), usuarioController.actualizar);
+
+// Eliminar usuario: Solo admin
 router.delete('/:id', authenticateJWT, requireRole(['admin']), usuarioController.eliminar);
 
 module.exports = router;
