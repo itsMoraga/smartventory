@@ -1,10 +1,31 @@
-const { Producto } = require('../models');
+const { Producto, FotoProducto } = require('../models');
 
 const productoControlador = {
   listar: async (req, res) => {
     try {
-      const productos = await Producto.findAll();
-      res.json(productos);
+      const productos = await Producto.findAll({
+        include: [
+          {
+            model: FotoProducto,
+            attributes: ['url'],
+            required: false,
+            limit: 1
+          }
+        ]
+      });
+      // Para compatibilidad, si hay varias fotos, solo se envía la primera
+      const productosConFoto = productos.map(p => {
+        const prod = p.toJSON();
+        let url = prod.FotoProductos?.[0]?.url || null;
+        // Si la url comienza con '/uploads/', quitar ese prefijo
+        if (url && url.startsWith('/uploads/')) {
+          url = url.replace('/uploads/', '');
+        }
+        prod.foto = url;
+        delete prod.FotoProductos;
+        return prod;
+      });
+      res.json(productosConFoto);
     } catch (error) {
       res.status(500).json({ mensaje: 'Error al obtener productos', error });
     }

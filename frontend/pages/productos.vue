@@ -26,14 +26,30 @@
         />
       </div>
 
-      <!-- Barra de búsqueda -->
-      <div class="mb-6 max-w-md">
+      <!-- Barra de búsqueda y filtros -->
+      <div class="mb-6 max-w-md flex items-center space-x-4">
         <input
           v-model="busqueda"
           type="text"
           placeholder="Buscar productos por nombre o descripción..."
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <button
+          @click="mostrarSoloStockBajo = !mostrarSoloStockBajo; mostrarSoloAgotados = false"
+          :class="mostrarSoloStockBajo ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700'"
+          class="px-4 py-2 rounded-md font-semibold transition-colors"
+        >
+          <span v-if="mostrarSoloStockBajo">Mostrar todos</span>
+          <span v-else>Solo stock bajo ⚠️</span>
+        </button>
+        <button
+          @click="mostrarSoloAgotados = !mostrarSoloAgotados; mostrarSoloStockBajo = false"
+          :class="mostrarSoloAgotados ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700'"
+          class="px-4 py-2 rounded-md font-semibold transition-colors"
+        >
+          <span v-if="mostrarSoloAgotados">Mostrar todos</span>
+          <span v-else>Solo agotados 🛑</span>
+        </button>
       </div>
 
       <!-- Loading State -->
@@ -52,16 +68,21 @@
         <button @click="abrirModalCrear" class="text-blue-600 hover:underline">Crear el primero</button>
       </div>
 
-      <!-- Grid de Productos -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Grid de Productos con scroll infinito -->
+      <div 
+        v-else 
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        ref="gridRef"
+      >
         <ProductoCard 
-          v-for="prod in productosFiltrados" 
+          v-for="prod in productosScroll" 
           :key="prod.id_producto" 
           :producto="prod"
           @editar="abrirModalEditar"
           @eliminar="eliminarProducto"
         />
       </div>
+      <div v-if="cargandoMas" class="text-center py-4 text-gray-500">Cargando más productos...</div>
     </main>
 
     <!-- Modal Formulario -->
@@ -93,6 +114,8 @@ const { data: categorias = [] } = await useFetch('http://localhost:4000/api/cate
 const categoriaSeleccionada = ref(null)
 const busqueda = ref('')
 
+const mostrarSoloStockBajo = ref(false)
+const mostrarSoloAgotados = ref(false)
 const productosFiltrados = computed(() => {
   let lista = productos.value
   if (categoriaSeleccionada.value) {
@@ -108,8 +131,60 @@ const productosFiltrados = computed(() => {
       return nombreNorm.includes(q) || descNorm.includes(q)
     })
   }
+  if (mostrarSoloStockBajo.value && !mostrarSoloAgotados.value) {
+    lista = lista.filter(p => p.cantidad <= p.stock_minimo && p.cantidad > 0)
+  } else if (mostrarSoloAgotados.value) {
+    lista = lista.filter(p => p.cantidad === 0)
+  }
   return lista
 })
+
+// Scroll infinito
+const gridRef = ref(null)
+const productosScroll = ref([])
+const pageSize = 12
+const page = ref(1)
+const cargandoMas = ref(false)
+
+function cargarMas(reset = false) {
+  if (reset) {
+    page.value = 1
+    productosScroll.value = []
+  }
+  cargandoMas.value = true
+  setTimeout(() => {
+    const start = 0
+    const end = page.value * pageSize
+    productosScroll.value = productosFiltrados.value.slice(start, end)
+    cargandoMas.value = false
+  }, 300)
+}
+
+watch([
+  productosFiltrados,
+  mostrarSoloStockBajo,
+  mostrarSoloAgotados,
+  categoriaSeleccionada,
+  busqueda
+], () => {
+  cargarMas(true)
+})
+
+onMounted(() => {
+  cargarMas(true)
+  window.addEventListener('scroll', handleScroll)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
+function handleScroll() {
+  const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 200
+  if (bottom && productosScroll.value.length < productosFiltrados.value.length) {
+    page.value++
+    cargarMas()
+  }
+}
 
 const abrirModalCrear = () => {
   productoSeleccionado.value = null

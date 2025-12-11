@@ -6,6 +6,11 @@ const Usuario = require("./Usuario")(sequelize, DataTypes);
 const Categoria = require("./Categoria")(sequelize, DataTypes);
 const Producto = require("./Producto")(sequelize, DataTypes);
 const FotoProducto = require("./FotoProducto")(sequelize, DataTypes);
+const Movimiento = require("./Movimiento")(sequelize, DataTypes);
+// Movimiento pertenece a Producto y Usuario
+Movimiento.belongsTo(Producto, { foreignKey: "id_producto" });
+Movimiento.belongsTo(Usuario, { foreignKey: "id_usuario" });
+Producto.hasMany(Movimiento, { foreignKey: "id_producto" });
 
 // Relaciones
 Usuario.hasMany(Producto, { foreignKey: "id_usuario" });
@@ -23,4 +28,5 @@ module.exports = {
   Categoria,
   Producto,
   FotoProducto,
+  Movimiento,
 };

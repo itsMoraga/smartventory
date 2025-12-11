@@ -9,6 +9,11 @@
       </div>
 
       <form @submit.prevent="handleSubmit" class="p-6 space-y-4">
+        <!-- Galería de imágenes solo en edición -->
+        <div v-if="producto?.id_producto" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Imágenes</label>
+          <GaleriaProducto :idProducto="producto.id_producto" @saved="emit('saved')" />
+        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
           <input 
@@ -77,6 +82,7 @@
 </template>
 
 <script setup>
+import GaleriaProducto from './GaleriaProducto.vue'
 const props = defineProps({
   isOpen: Boolean,
   producto: Object

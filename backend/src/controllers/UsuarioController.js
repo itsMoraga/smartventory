@@ -5,7 +5,7 @@ const { Usuario } = require('../models');
 const UsuarioController = {
   registrar: async (req, res) => {
     try {
-      const { nombre, correo, contrasena } = req.body;
+      const { nombre, correo, contrasena, rol } = req.body;
 
       if (!nombre || !correo || !contrasena) {
         return res.status(400).json({ mensaje: 'Faltan campos obligatorios (nombre, correo, contrasena)' });
@@ -24,13 +24,14 @@ const UsuarioController = {
       const nuevo = await Usuario.create({
         nombre,
         correo,
-        contrasena: hash
+        contrasena: hash,
+        rol: rol || 'operador'
       });
 
       // Retornamos id y datos no sensibles
       return res.status(201).json({
         mensaje: 'Usuario registrado correctamente',
-        usuario: { id_usuario: nuevo.id_usuario, nombre: nuevo.nombre, correo: nuevo.correo }
+        usuario: { id_usuario: nuevo.id_usuario, nombre: nuevo.nombre, correo: nuevo.correo, rol: nuevo.rol }
       });
     } catch (error) {
       console.error('Error registrar usuario:', error);
@@ -61,10 +62,19 @@ const UsuarioController = {
       // Aquí podrías generar un token JWT si usas authMiddleware
       // const token = jwt.sign({ id: usuario.id_usuario }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+        // Generar token JWT
+        const jwt = require('jsonwebtoken');
+        const token = jwt.sign({
+          id_usuario: usuario.id_usuario,
+          nombre: usuario.nombre,
+          correo: usuario.correo,
+          rol: usuario.rol
+        }, process.env.JWT_SECRET || 'supersecreto', { expiresIn: '2h' });
+
       res.json({
         mensaje: 'Login exitoso',
-        usuario: { id_usuario: usuario.id_usuario, nombre: usuario.nombre, correo: usuario.correo }
-        // token: token 
+        usuario: { id_usuario: usuario.id_usuario, nombre: usuario.nombre, correo: usuario.correo, rol: usuario.rol },
+        token
       });
     } catch (error) {
       console.error('Error en login:', error);
@@ -74,7 +84,7 @@ const UsuarioController = {
 
   listar: async (req, res) => {
     try {
-      const usuarios = await Usuario.findAll({ attributes: ['id_usuario','nombre','correo'] });
+      const usuarios = await Usuario.findAll({ attributes: ['id_usuario','nombre','correo','rol'] });
       res.json(usuarios);
     } catch (error) {
       res.status(500).json({ mensaje: 'Error al obtener usuarios', error: error.message });
@@ -84,7 +94,7 @@ const UsuarioController = {
   obtenerPorId: async (req, res) => {
     try {
       const { id } = req.params;
-      const usuario = await Usuario.findByPk(id, { attributes: ['id_usuario', 'nombre', 'correo'] });
+      const usuario = await Usuario.findByPk(id, { attributes: ['id_usuario', 'nombre', 'correo', 'rol'] });
       if (!usuario) {
         return res.status(404).json({ mensaje: 'Usuario no encontrado' });
       }

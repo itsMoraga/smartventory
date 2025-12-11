@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     contrasena: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    rol: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'operador' // valores posibles: 'admin', 'operador', 'lectura'
     }
   }, {
     tableName: "usuarios",
