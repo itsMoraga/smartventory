@@ -1,37 +1,34 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md transition-all duration-300 hover:shadow-2xl">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl transition-all duration-300 hover:shadow-2xl">
     <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-800">Crear Cuenta</h2>
-      <p class="text-gray-500 text-sm mt-2">Únete a Smartventory hoy mismo</p>
+      <h2 class="text-2xl font-bold text-gray-800">Crear Cuenta de Empresa</h2>
+      <p class="text-gray-500 text-sm mt-2">Configura tu espacio de trabajo en Smartventory</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="flex items-center justify-center mb-8">
+      <div class="flex items-center">
+        <div :class="`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`">1</div>
+        <div :class="`h-1 w-16 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`"></div>
+        <div :class="`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`">2</div>
+      </div>
     </div>
 
     <form @submit.prevent="register" class="space-y-6">
-      <!-- Bloque 1: Información de la Empresa -->
-      <div class="border-b border-gray-100 pb-4 mb-4">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Información de la Empresa</h3>
+      
+      <!-- Paso 1: Datos de la Empresa -->
+      <div v-if="step === 1" class="space-y-4 animate-fade-in">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Datos del Negocio</h3>
         
-        <!-- Nombre Empresa -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Negocio</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-400 text-lg">🏢</span>
-            </div>
-            <input 
-              v-model="nombreEmpresa" 
-              type="text" 
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none bg-gray-50 focus:bg-white" 
-              placeholder="Mi Empresa S.A."
-              required 
-            />
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Organización</label>
+          <input v-model="form.nombre_empresa" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Mi Empresa S.A." required />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <!-- País -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">País</label>
-            <select v-model="pais" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white">
+            <select v-model="form.pais" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="MX">México</option>
               <option value="CO">Colombia</option>
               <option value="AR">Argentina</option>
@@ -41,129 +38,77 @@
               <option value="PE">Perú</option>
             </select>
           </div>
-          <!-- Moneda -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
-            <select v-model="moneda" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white">
-              <option value="USD">USD ($)</option>
-              <option value="MXN">MXN ($)</option>
-              <option value="COP">COP ($)</option>
-              <option value="EUR">EUR (€)</option>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda Base</label>
+            <select v-model="form.moneda" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="USD">USD - Dólar Estadounidense</option>
+              <option value="MXN">MXN - Peso Mexicano</option>
+              <option value="COP">COP - Peso Colombiano</option>
+              <option value="EUR">EUR - Euro</option>
             </select>
           </div>
         </div>
-        
-        <!-- Zona Horaria -->
-        <div class="mt-4">
+
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Zona Horaria</label>
-          <select v-model="zonaHoraria" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 focus:bg-white">
-            <option value="UTC">UTC</option>
+          <select v-model="form.zona_horaria" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="UTC">UTC (Universal)</option>
             <option value="America/Mexico_City">America/Mexico_City</option>
             <option value="America/Bogota">America/Bogota</option>
             <option value="America/Argentina/Buenos_Aires">America/Argentina/Buenos_Aires</option>
             <option value="Europe/Madrid">Europe/Madrid</option>
           </select>
         </div>
+
+        <div class="flex justify-end pt-4">
+          <button type="button" @click="nextStep" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            Siguiente &rarr;
+          </button>
+        </div>
       </div>
 
-      <!-- Bloque 2: Información del Administrador -->
-      <div>
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Datos del Administrador</h3>
-        
-        <!-- Name Input -->
-        <div class="mb-4">
+      <!-- Paso 2: Datos del Administrador -->
+      <div v-if="step === 2" class="space-y-4 animate-fade-in">
+        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Datos del Administrador</h3>
+
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-400 text-lg">👤</span>
-            </div>
-            <input 
-              v-model="nombre" 
-              type="text" 
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none bg-gray-50 focus:bg-white" 
-              placeholder="Juan Pérez"
-              required 
-            />
-          </div>
+          <input v-model="form.nombre" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Juan Pérez" required />
         </div>
 
-        <!-- Email Input -->
-        <div class="mb-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-400 text-lg">✉️</span>
-            </div>
-            <input 
-              v-model="correo" 
-              type="email" 
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none bg-gray-50 focus:bg-white" 
-              placeholder="ejemplo@correo.com"
-              required 
-            />
-          </div>
+          <input v-model="form.correo" type="email" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="admin@miempresa.com" required />
         </div>
 
-        <!-- Password Input -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="text-gray-400 text-lg">🔒</span>
-            </div>
-            <input 
-              v-model="contrasena" 
-              :type="mostrarPassword ? 'text' : 'password'" 
-              class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none bg-gray-50 focus:bg-white" 
-              placeholder="••••••••"
-              required 
-            />
-            <button 
-              type="button"
-              @click="mostrarPassword = !mostrarPassword"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
-            >
-              <span v-if="mostrarPassword">👁️</span>
-              <span v-else>👁️‍🗨️</span>
-            </button>
-          </div>
+          <input v-model="form.contrasena" type="password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••" required />
+          <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
+        </div>
+
+        <div class="flex justify-between pt-4">
+          <button type="button" @click="step = 1" class="text-gray-600 hover:text-gray-800 px-4 py-2">
+            &larr; Volver
+          </button>
+          <button type="submit" :disabled="cargando" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+            <span v-if="cargando" class="mr-2">⏳</span>
+            {{ cargando ? 'Creando cuenta...' : 'Finalizar Registro' }}
+          </button>
         </div>
       </div>
 
       <!-- Error Message -->
-      <div v-if="error" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg animate-pulse">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <span class="text-red-500">⚠️</span>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">{{ error }}</p>
-          </div>
-        </div>
+      <div v-if="error" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mt-4">
+        <p class="text-sm text-red-700">{{ error }}</p>
       </div>
 
-      <!-- Submit Button -->
-      <button 
-        type="submit" 
-        :disabled="cargando"
-        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-      >
-        <span v-if="cargando" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Registrando...
-        </span>
-        <span v-else>Crear Cuenta</span>
-      </button>
     </form>
 
-    <!-- Login Link -->
     <div class="mt-8 text-center border-t border-gray-100 pt-6">
       <p class="text-sm text-gray-600">
         ¿Ya tienes una cuenta? 
-        <NuxtLink to="/login" class="font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+        <NuxtLink to="/login" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
           Inicia sesión aquí
         </NuxtLink>
       </p>
@@ -179,50 +124,61 @@ definePageMeta({
   layout: 'auth'
 })
 
-const nombre = ref('')
-const correo = ref('')
-const contrasena = ref('')
-const nombreEmpresa = ref('')
-const pais = ref('MX')
-const moneda = ref('MXN')
-const zonaHoraria = ref('America/Mexico_City')
-
-const error = ref('')
-const cargando = ref(false)
-const mostrarPassword = ref(false)
 const router = useRouter()
+const step = ref(1)
+const cargando = ref(false)
+const error = ref('')
 
-async function register() {
+const form = ref({
+  nombre_empresa: '',
+  pais: 'MX',
+  moneda: 'USD',
+  zona_horaria: 'UTC',
+  nombre: '',
+  correo: '',
+  contrasena: ''
+})
+
+const nextStep = () => {
+  if (!form.value.nombre_empresa) {
+    error.value = 'El nombre de la empresa es obligatorio'
+    return
+  }
+  error.value = ''
+  step.value = 2
+}
+
+const register = async () => {
   error.value = ''
   cargando.value = true
   
-  await new Promise(resolve => setTimeout(resolve, 800))
-
   try {
     const res = await $fetch('http://localhost:4000/api/users/register', {
       method: 'POST',
-      body: { 
-        nombre: nombre.value,
-        correo: correo.value, 
-        contrasena: contrasena.value,
-        nombre_empresa: nombreEmpresa.value,
-        pais: pais.value,
-        moneda: moneda.value,
-        zona_horaria: zonaHoraria.value
-      }
+      body: form.value
     })
     
-    // Auto-login tras registro exitoso
+    // Auto-login con el token recibido
     localStorage.setItem('token', res.token)
     localStorage.setItem('rol', res.usuario.rol)
     localStorage.setItem('usuario', JSON.stringify(res.usuario))
     
-    alert('Cuenta y Empresa creadas exitosamente.')
+    alert('¡Cuenta creada exitosamente! Bienvenido.')
     router.push('/dashboard')
   } catch (e) {
-    error.value = e.data?.mensaje || 'Error al registrar usuario.'
+    error.value = e.data?.mensaje || 'Error al registrar la cuenta.'
   } finally {
     cargando.value = false
   }
 }
 </script>
+
+<style>
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>

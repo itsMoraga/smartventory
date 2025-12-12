@@ -28,16 +28,19 @@ exports.crear = async (req, res) => {
 };
 
 exports.actualizar = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const [updated] = await Proveedor.update(req.body, {
       where: { 
         id_proveedor: id,
         id_empresa: req.user.id_empresa
       }
     });
+
     if (updated) {
-      const proveedorActualizado = await Proveedor.findByPk(id);
+      const proveedorActualizado = await Proveedor.findOne({
+        where: { id_proveedor: id, id_empresa: req.user.id_empresa }
+      });
       res.json(proveedorActualizado);
     } else {
       res.status(404).json({ mensaje: 'Proveedor no encontrado' });
@@ -52,14 +55,15 @@ exports.actualizar = async (req, res) => {
 };
 
 exports.eliminar = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const deleted = await Proveedor.destroy({
       where: { 
         id_proveedor: id,
         id_empresa: req.user.id_empresa
       }
     });
+
     if (deleted) {
       res.json({ mensaje: 'Proveedor eliminado' });
     } else {

@@ -10,7 +10,7 @@ async function sincronizarBD() {
     console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
     console.log("DB_NAME:", process.env.DB_NAME);
 
-    await sequelize.sync({ alter: true }); // ahora sí funciona
+    await sequelize.sync({ force: true }); // Reinicia la base de datos (BORRA DATOS)
 
     console.log("✅ Base de datos sincronizada correctamente.");
     process.exit();

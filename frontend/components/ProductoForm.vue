@@ -208,7 +208,7 @@ const form = ref({
 // Cargar categorías y proveedores al montar
 onMounted(async () => {
   try {
-    const token = useCookie('token').value
+    const token = localStorage.getItem('token')
     const headers = { Authorization: `Bearer ${token}` }
     
     const [cats, provs] = await Promise.all([

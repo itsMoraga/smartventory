@@ -15,14 +15,6 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    id_empresa: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'empresas',
-        key: 'id_empresa'
-      }
-    },
     contacto: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -57,16 +49,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       validate: {
         len: {
-          args: [10, 500],
-          msg: "La dirección debe tener entre 10 y 500 caracteres"
+          args: [0, 255],
+          msg: "La dirección no puede exceder los 255 caracteres"
         }
+      }
+    },
+    id_empresa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'empresas',
+        key: 'id_empresa'
       }
     }
   }, {
     tableName: "proveedores",
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    timestamps: false
   });
 
   return Proveedor;

@@ -9,14 +9,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    id_empresa: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'empresas',
-        key: 'id_empresa'
-      }
-    },
     tipo: {
       type: DataTypes.ENUM('entrada', 'salida', 'ajuste'),
       allowNull: false
@@ -46,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
           args: [0, 255],
           msg: "Las observaciones no pueden exceder los 255 caracteres"
         }
+      }
+    },
+    id_empresa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'empresas',
+        key: 'id_empresa'
       }
     }
   }, {

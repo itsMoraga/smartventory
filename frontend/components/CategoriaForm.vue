@@ -68,6 +68,9 @@ const handleSubmit = async () => {
 
     await $fetch(url, {
       method,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
       body: form.value
     })
 

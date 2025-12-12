@@ -1,62 +1,58 @@
-const { Producto, Categoria, Usuario, Movimiento } = require('../models');
-const { Op, col } = require('sequelize');
+const { Producto, Movimiento, Categoria, Proveedor, sequelize } = require('../models');
+const { Op } = require('sequelize');
 
 exports.getDashboardStats = async (req, res) => {
   try {
-    const whereEmpresa = { id_empresa: req.user.id_empresa };
+    const id_empresa = req.user.id_empresa;
 
-    // 1. Contadores Totales
-    const totalProductos = await Producto.count({ where: whereEmpresa });
-    const totalCategorias = await Categoria.count({ where: whereEmpresa });
-    const totalUsuarios = await Usuario.count({ where: whereEmpresa });
+    // 1. Total de Productos
+    const totalProductos = await Producto.count({ where: { id_empresa } });
 
-    // Calcular Valor Total del Inventario (Costo * Cantidad)
-    const productos = await Producto.findAll({
-      where: whereEmpresa,
-      attributes: ['cantidad', 'precio_costo']
+    // 2. Valor Total del Inventario (precio_costo * cantidad)
+    const inventarioData = await Producto.findOne({
+      where: { id_empresa },
+      attributes: [
+        [sequelize.fn('SUM', sequelize.literal('precio_costo * cantidad')), 'total']
+      ],
+      raw: true
     });
-    
-    const valorTotalInventario = productos.reduce((total, prod) => {
-      const costo = parseFloat(prod.precio_costo) || 0;
-      return total + (costo * prod.cantidad);
-    }, 0);
+    const valorInventario = inventarioData ? inventarioData.total : 0;
 
-    // 2. Productos con Stock Bajo
-    // Buscamos productos donde cantidad <= stock_minimo
-    const productosStockBajo = await Producto.findAll({
+    // 3. Productos con Stock Bajo
+    const stockBajo = await Producto.count({
       where: {
-        ...whereEmpresa,
-        cantidad: {
-          [Op.lte]: col('stock_minimo')
-        }
-      },
-      limit: 5, // Solo mostramos los 5 más críticos en el dashboard
-      order: [['cantidad', 'ASC']]
+        id_empresa,
+        cantidad: { [Op.lte]: sequelize.col('stock_minimo') }
+      }
     });
 
-    // 3. Últimos Movimientos
-    const ultimosMovimientos = await Movimiento.findAll({
-      where: whereEmpresa,
+    // 4. Movimientos Recientes (últimos 5)
+    const movimientosRecientes = await Movimiento.findAll({
+      where: { id_empresa },
       limit: 5,
       order: [['fecha', 'DESC']],
       include: [
         { model: Producto, attributes: ['nombre'] },
-        { model: Usuario, attributes: ['nombre'] }
+        { model: Proveedor, attributes: ['nombre'] } // Opcional, si quieres mostrar proveedor
       ]
     });
+
+    // 5. Categorías con más productos (Top 5) - Opcional
+    // Requiere agrupación, puede ser complejo con Sequelize puro, lo omitimos por ahora o hacemos simple count
+    const totalCategorias = await Categoria.count({ where: { id_empresa } });
 
     res.json({
       kpis: {
         totalProductos,
-        totalCategorias,
-        totalUsuarios,
-        valorTotalInventario
+        valorTotalInventario: valorInventario || 0,
+        productosStockBajo: stockBajo,
+        totalCategorias
       },
-      stockBajo: productosStockBajo,
-      ultimosMovimientos
+      movimientosRecientes
     });
+
   } catch (error) {
     console.error('Error en dashboard:', error);
-    res.status(500).json({ mensaje: 'Error al obtener estadísticas', error });
+    res.status(500).json({ mensaje: 'Error al obtener estadísticas', error: error.message });
   }
 };

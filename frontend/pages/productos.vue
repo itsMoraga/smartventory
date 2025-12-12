@@ -114,11 +114,19 @@ const productoSeleccionado = ref(null)
 
 // Fetch de productos
 const { data: productos, pending, error, refresh } = await useFetch('http://localhost:4000/api/products', {
+  headers: {
+    Authorization: `Bearer ${import.meta.client ? localStorage.getItem('token') : ''}`
+  },
+  server: false,
   default: () => []
 })
 
 // Fetch de categorías para el filtro
 const { data: categorias = [] } = await useFetch('http://localhost:4000/api/categories', {
+  headers: {
+    Authorization: `Bearer ${import.meta.client ? localStorage.getItem('token') : ''}`
+  },
+  server: false,
   default: () => []
 })
 

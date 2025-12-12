@@ -10,7 +10,7 @@ const FotoProducto = require("./FotoProducto")(sequelize, DataTypes);
 const Movimiento = require("./Movimiento")(sequelize, DataTypes);
 const Proveedor = require("./Proveedor")(sequelize, DataTypes);
 
-// Relaciones Multi-Tenant (Empresa)
+// Relaciones Multi-Tenant (Empresa tiene muchos...)
 Empresa.hasMany(Usuario, { foreignKey: "id_empresa" });
 Usuario.belongsTo(Empresa, { foreignKey: "id_empresa" });
 
@@ -20,11 +20,11 @@ Producto.belongsTo(Empresa, { foreignKey: "id_empresa" });
 Empresa.hasMany(Categoria, { foreignKey: "id_empresa" });
 Categoria.belongsTo(Empresa, { foreignKey: "id_empresa" });
 
-Empresa.hasMany(Proveedor, { foreignKey: "id_empresa" });
-Proveedor.belongsTo(Empresa, { foreignKey: "id_empresa" });
-
 Empresa.hasMany(Movimiento, { foreignKey: "id_empresa" });
 Movimiento.belongsTo(Empresa, { foreignKey: "id_empresa" });
+
+Empresa.hasMany(Proveedor, { foreignKey: "id_empresa" });
+Proveedor.belongsTo(Empresa, { foreignKey: "id_empresa" });
 
 // Movimiento pertenece a Producto y Usuario
 Movimiento.belongsTo(Producto, { foreignKey: "id_producto" });

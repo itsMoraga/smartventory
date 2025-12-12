@@ -52,64 +52,6 @@ const productoControlador = {
   // Opcional: obtener producto por ID
   obtenerPorId: async (req, res) => {
     try {
-      const producto = await Producto.findOne({
-        where: { 
-          id_producto: req.params.id,
-          id_empresa: req.user.id_empresa
-        },
-        include: [
-          { model: FotoProducto, attributes: ['url'] },
-          { model: Proveedor, attributes: ['nombre'] }
-        ]
-      });
-      if (!producto) return res.status(404).json({ mensaje: 'Producto no encontrado' });
-      res.json(producto);
-    } catch (error) {
-      res.status(500).json({ mensaje: 'Error al obtener producto', error });
-    }
-  },
-
-  actualizar: async (req, res) => {
-    try {
-      const [updated] = await Producto.update(req.body, {
-        where: { 
-          id_producto: req.params.id,
-          id_empresa: req.user.id_empresa
-        }
-      });
-      if (updated) {
-        const actualizado = await Producto.findOne({
-          where: { id_producto: req.params.id, id_empresa: req.user.id_empresa }
-        });
-        res.json(actualizado);
-      } else {
-        res.status(404).json({ mensaje: 'Producto no encontrado' });
-      }
-    } catch (error) {
-      res.status(500).json({ mensaje: 'Error al actualizar producto', error });
-    }
-  },
-
-  eliminar: async (req, res) => {
-    try {
-      const deleted = await Producto.destroy({
-        where: { 
-          id_producto: req.params.id,
-          id_empresa: req.user.id_empresa
-        }
-      });
-      if (deleted) {
-        res.json({ mensaje: 'Producto eliminado' });
-      } else {
-        res.status(404).json({ mensaje: 'Producto no encontrado' });
-      }
-    } catch (error) {
-      res.status(500).json({ mensaje: 'Error al eliminar producto', error });
-    }
-  }
-};
-
-module.exports = productoControlador;
       const producto = await Producto.findByPk(req.params.id);
       if (!producto) return res.status(404).json({ mensaje: 'Producto no encontrado' });
       res.json(producto);

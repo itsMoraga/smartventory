@@ -27,7 +27,7 @@ const FotoProductoController = {
       });
       if (!producto) {
         fs.unlinkSync(req.file.path);
-        return res.status(404).json({ mensaje: 'Producto no encontrado' });
+        return res.status(404).json({ mensaje: 'Producto no encontrado o no autorizado' });
       }
 
       // Guardar ruta relativa para servirla estáticamente.
@@ -58,14 +58,11 @@ const FotoProductoController = {
     try {
       const { id_producto } = req.params;
       
-      // Verificar que el producto pertenece a la empresa
+      // Verificar pertenencia del producto
       const producto = await Producto.findOne({
-        where: { 
-          id_producto,
-          id_empresa: req.user.id_empresa
-        }
+        where: { id_producto, id_empresa: req.user.id_empresa }
       });
-
+      
       if (!producto) {
         return res.status(404).json({ mensaje: 'Producto no encontrado' });
       }
@@ -81,7 +78,7 @@ const FotoProductoController = {
     try {
       const { id } = req.params;
       
-      // Buscar la foto e incluir el producto para verificar la empresa
+      // Buscar la foto y verificar que el producto asociado pertenezca a la empresa
       const foto = await FotoProducto.findOne({
         where: { id_foto: id },
         include: {

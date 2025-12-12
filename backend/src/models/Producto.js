@@ -9,14 +9,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    id_empresa: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'empresas',
-        key: 'id_empresa'
-      }
-    },
     descripcion: {
       type: DataTypes.TEXT,
       allowNull: true
@@ -52,6 +44,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
+    },
+    id_empresa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'empresas',
+        key: 'id_empresa'
+      }
     },
     id_proveedor: {
       type: DataTypes.INTEGER,

@@ -55,37 +55,22 @@ const MovimientoController = {
         id_proveedor: (tipo === 'entrada' && id_proveedor) ? id_proveedor : null,
         id_empresa: req.user.id_empresa
       });
-
-      // Actualizar stock del producto
-      const producto = await Producto.findOne({
-        where: { 
-          id_producto,
-          id_empresa: req.user.id_empresa
-        }
-      });
       
-      if (!producto) {
-        return res.status(404).json({ mensaje: 'Producto no encontrado' });
+      // Actualizar stock del producto si es entrada/salida/ajuste
+      const producto = await Producto.findByPk(id_producto);
+      if (producto) {
+        let nuevoStock = producto.cantidad;
+        if (tipo === 'entrada') nuevoStock += cantidad;
+        else if (tipo === 'salida') nuevoStock -= cantidad;
+        else if (tipo === 'ajuste') nuevoStock = cantidad;
+        await producto.update({ cantidad: nuevoStock });
       }
-
-      if (tipo === 'entrada') {
-        producto.cantidad += parseInt(cantidad);
-      } else if (tipo === 'salida') {
-        if (producto.cantidad < cantidad) {
-          return res.status(400).json({ mensaje: 'Stock insuficiente' });
-        }
-        producto.cantidad -= parseInt(cantidad);
-      } else if (tipo === 'ajuste') {
-        // Ajuste podría ser sumar o restar, aquí asumimos que 'cantidad' es el ajuste neto
-        // O podríamos implementar lógica específica. Por simplicidad, asumimos que ajuste reemplaza o suma.
-        // Vamos a asumir que ajuste SUMA (si es negativo resta)
-        producto.cantidad += parseInt(cantidad);
-      }
-
-      await producto.save();
-
       res.status(201).json({ mensaje: 'Movimiento registrado', movimiento });
     } catch (error) {
+      if (error.name === 'SequelizeValidationError') {
+        const mensajes = error.errors.map(e => e.message);
+        return res.status(400).json({ mensaje: 'Error de validación', errores: mensajes });
+      }
       res.status(500).json({ mensaje: 'Error al registrar movimiento', error });
     }
   }
