@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-100 font-sans">
+  <div class="flex min-h-screen bg-gray-100 font-sans">
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl fixed h-full z-10 transition-all duration-300">
       <!-- Brand -->
@@ -25,6 +25,16 @@
         <NuxtLink to="/categorias" active-class="bg-blue-600 text-white shadow-lg" class="flex items-center px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all group">
           <span class="mr-3 text-xl">🏷️</span>
           <span class="font-medium">Categorías</span>
+        </NuxtLink>
+
+        <NuxtLink to="/movimientos" active-class="bg-blue-600 text-white shadow-lg" class="flex items-center px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all group">
+          <span class="mr-3 text-xl">📋</span>
+          <span class="font-medium">Movimientos</span>
+        </NuxtLink>
+
+        <NuxtLink to="/proveedores" active-class="bg-blue-600 text-white shadow-lg" class="flex items-center px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all group">
+          <span class="mr-3 text-xl">🚚</span>
+          <span class="font-medium">Proveedores</span>
         </NuxtLink>
 
         <div v-if="esAdmin" class="pt-4 mt-4 border-t border-slate-800">
@@ -59,7 +69,7 @@
       <!-- <header class="bg-white shadow-sm h-16 flex items-center px-8"> ... </header> -->
 
       <!-- Page Content -->
-      <main class="flex-1 p-8 overflow-y-auto">
+      <main class="flex-1 p-8">
         <slot />
       </main>
     </div>

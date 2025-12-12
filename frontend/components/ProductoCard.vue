@@ -7,23 +7,41 @@
     </div>
     
     <div class="p-4">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ producto.nombre }}</h3>
-      <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ producto.descripcion || 'Sin descripción' }}</p>
-      
-      <div class="flex justify-between items-center" @click.stop>
-
-        <span class="text-xl font-bold text-blue-600">${{ producto.precio }}</span>
-
-        <!-- Alerta de stock bajo -->
-        <span v-if="producto.cantidad <= producto.stock_minimo" class="ml-2 px-2 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full flex items-center" title="Stock bajo">
-          <span class="mr-1">⚠️</span> Stock bajo
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="text-lg font-semibold text-gray-800 leading-tight">{{ producto.nombre }}</h3>
+        <span v-if="producto.cantidad <= producto.stock_minimo" class="px-2 py-1 text-xs font-bold bg-red-100 text-red-700 rounded-full whitespace-nowrap" title="Stock bajo">
+          ⚠️ Bajo
         </span>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-3">
+        <div>
+          <p class="text-xs text-gray-400 uppercase">Ubicación</p>
+          <p class="font-medium truncate">{{ producto.ubicacion || 'N/A' }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 uppercase">Stock</p>
+          <p class="font-medium" :class="{'text-red-600 font-bold': producto.cantidad <= producto.stock_minimo}">
+            {{ producto.cantidad }} {{ producto.unidad_medida || 'unidades' }}
+          </p>
+        </div>
+        <div v-if="producto.Proveedor" class="col-span-2">
+          <p class="text-xs text-gray-400 uppercase">Proveedor</p>
+          <p class="font-medium truncate">{{ producto.Proveedor.nombre }}</p>
+        </div>
+      </div>
+      
+      <div class="flex justify-between items-center border-t pt-3" @click.stop>
+        <div>
+          <p class="text-xs text-gray-400 uppercase">Precio</p>
+          <span class="text-xl font-bold text-blue-600">${{ producto.precio }}</span>
+        </div>
 
-        <div class="flex space-x-2">
+        <div class="flex space-x-1">
           <button 
             v-if="rol === 'admin' || rol === 'operador'"
             @click="$emit('editar', producto)" 
-            class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+            class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
             title="Editar"
           >
             ✏️
@@ -31,7 +49,7 @@
           <button 
             v-if="rol === 'admin'"
             @click="$emit('eliminar', producto.id_producto)" 
-            class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+            class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
             title="Eliminar"
           >
             🗑️

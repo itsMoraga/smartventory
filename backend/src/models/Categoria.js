@@ -8,6 +8,14 @@ module.exports = (sequelize, DataTypes) => {
     nombre: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    id_empresa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'empresas',
+        key: 'id_empresa'
+      }
     }
   }, {
     tableName: "categorias",

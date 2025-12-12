@@ -18,8 +18,13 @@ const FotoProductoController = {
         return res.status(400).json({ mensaje: 'El id_producto es obligatorio' });
       }
 
-      // Verificar que el producto existe
-      const producto = await Producto.findByPk(id_producto);
+      // Verificar que el producto existe y pertenece a la empresa
+      const producto = await Producto.findOne({
+        where: { 
+          id_producto,
+          id_empresa: req.user.id_empresa
+        }
+      });
       if (!producto) {
         fs.unlinkSync(req.file.path);
         return res.status(404).json({ mensaje: 'Producto no encontrado' });
@@ -52,6 +57,19 @@ const FotoProductoController = {
   listarPorProducto: async (req, res) => {
     try {
       const { id_producto } = req.params;
+      
+      // Verificar que el producto pertenece a la empresa
+      const producto = await Producto.findOne({
+        where: { 
+          id_producto,
+          id_empresa: req.user.id_empresa
+        }
+      });
+
+      if (!producto) {
+        return res.status(404).json({ mensaje: 'Producto no encontrado' });
+      }
+
       const fotos = await FotoProducto.findAll({ where: { id_producto } });
       res.json(fotos);
     } catch (error) {
@@ -62,7 +80,15 @@ const FotoProductoController = {
   eliminar: async (req, res) => {
     try {
       const { id } = req.params;
-      const foto = await FotoProducto.findByPk(id);
+      
+      // Buscar la foto e incluir el producto para verificar la empresa
+      const foto = await FotoProducto.findOne({
+        where: { id_foto: id },
+        include: {
+          model: Producto,
+          where: { id_empresa: req.user.id_empresa }
+        }
+      });
 
       if (!foto) {
         return res.status(404).json({ mensaje: 'Foto no encontrada' });

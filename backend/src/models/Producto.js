@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    id_empresa: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'empresas',
+        key: 'id_empresa'
+      }
+    },
     descripcion: {
       type: DataTypes.TEXT,
       allowNull: true
@@ -17,15 +25,37 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10,2),
       allowNull: true
     },
+    precio_costo: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: true,
+      defaultValue: 0.00
+    },
     cantidad: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
     },
+    unidad_medida: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'unidad'
+    },
+    ubicacion: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    fecha_caducidad: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
     stock_minimo: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1
+    },
+    id_proveedor: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     id_usuario: {
       type: DataTypes.INTEGER,

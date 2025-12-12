@@ -1,52 +1,38 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800">Categorías</h1>
-        <p class="text-gray-500 mt-1">Organiza tus productos en categorías</p>
-      </div>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Gestión de Categorías</h1>
       <button 
         @click="abrirModalCrear"
-        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center font-semibold"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md"
       >
         <span class="mr-2 text-xl">+</span> Nueva Categoría
       </button>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <!-- Loading/Error states -->
+    <div v-if="pending" class="text-center py-10">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
     </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center">
+    <div v-else-if="error" class="bg-red-100 text-red-700 p-4 rounded-lg mb-6 border border-red-200">
       Error al cargar categorías: {{ error.message }}
     </div>
 
-    <!-- Empty State -->
-    <div v-else-if="categorias.length === 0" class="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
-      <div class="text-6xl mb-4">📂</div>
-      <h3 class="text-xl font-medium text-gray-900">No hay categorías</h3>
-      <p class="text-gray-500 mt-2 mb-6">Crea categorías para organizar mejor tu inventario.</p>
-      <button @click="abrirModalCrear" class="text-blue-600 font-medium hover:underline">Crear categoría</button>
-    </div>
-
     <!-- Grid de Categorías -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <CategoriaCard 
-        v-for="cat in categorias" 
+        v-for="cat in categories" 
         :key="cat.id_categoria" 
         :categoria="cat"
         @editar="abrirModalEditar"
-        @eliminar="eliminarCategoria"
+        @eliminar="confirmarEliminar"
       />
     </div>
 
     <!-- Modal Formulario -->
     <CategoriaForm 
-      :is-open="mostrarModal" 
-      :categoria="categoriaSeleccionada"
+      :is-open="modalOpen"
+      :categoria="categoriaEditando"
       @close="cerrarModal"
       @saved="recargarCategorias"
     />
@@ -54,43 +40,56 @@
 </template>
 
 <script setup>
-const mostrarModal = ref(false)
-const categoriaSeleccionada = ref(null)
+import { ref } from 'vue'
+import CategoriaCard from '~/components/CategoriaCard.vue'
+import CategoriaForm from '~/components/CategoriaForm.vue'
 
-// Fetch de categorías
-const { data: categorias, pending, error, refresh } = await useFetch('http://localhost:4000/api/categories', {
-  default: () => []
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase || 'http://localhost:4000/api'
+
+const modalOpen = ref(false)
+const categoriaEditando = ref(null)
+
+const { data: categories, pending, error, refresh } = await useFetch(`${apiBase}/categories`, {
+    headers: {
+        Authorization: `Bearer ${import.meta.client ? localStorage.getItem('token') : ''}`
+    },
+    server: false
 })
 
 const abrirModalCrear = () => {
-  categoriaSeleccionada.value = null
-  mostrarModal.value = true
+  categoriaEditando.value = null
+  modalOpen.value = true
 }
 
 const abrirModalEditar = (categoria) => {
-  categoriaSeleccionada.value = categoria
-  mostrarModal.value = true
+  categoriaEditando.value = { ...categoria }
+  modalOpen.value = true
 }
 
 const cerrarModal = () => {
-  mostrarModal.value = false
-  categoriaSeleccionada.value = null
+  modalOpen.value = false
+  categoriaEditando.value = null
 }
 
 const recargarCategorias = () => {
   refresh()
+  cerrarModal()
 }
 
-const eliminarCategoria = async (id) => {
+const confirmarEliminar = async (id) => {
   if (!confirm('¿Estás seguro de eliminar esta categoría?')) return
 
   try {
-    await $fetch(`http://localhost:4000/api/categories/${id}`, {
-      method: 'DELETE'
+    await $fetch(`${apiBase}/categories/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
     })
-    refresh() // Recargar lista
+    refresh()
   } catch (e) {
-    alert('Error al eliminar: ' + e.message)
+    alert('Error al eliminar categoría: ' + (e.data?.mensaje || e.message))
   }
 }
 </script>

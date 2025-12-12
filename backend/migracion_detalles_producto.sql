@@ -1,0 +1,5 @@
+ALTER TABLE productos
+ADD COLUMN precio_costo DECIMAL(10,2) NULL DEFAULT 0.00,
+ADD COLUMN ubicacion VARCHAR(100) NULL,
+ADD COLUMN unidad_medida VARCHAR(50) NULL DEFAULT 'unidad',
+ADD COLUMN fecha_caducidad DATE NULL;

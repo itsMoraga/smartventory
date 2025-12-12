@@ -10,6 +10,7 @@
           <th class="px-2 py-1 text-left">Fecha</th>
           <th class="px-2 py-1 text-left">Tipo</th>
           <th class="px-2 py-1 text-left">Cantidad</th>
+          <th class="px-2 py-1 text-left">Proveedor</th>
           <th class="px-2 py-1 text-left">Usuario</th>
           <th class="px-2 py-1 text-left">Observaciones</th>
         </tr>
@@ -17,8 +18,17 @@
       <tbody>
         <tr v-for="mov in movimientos" :key="mov.id_movimiento">
           <td class="px-2 py-1">{{ new Date(mov.fecha).toLocaleString() }}</td>
-          <td class="px-2 py-1">{{ mov.tipo }}</td>
+          <td class="px-2 py-1">
+            <span :class="{
+              'text-green-600 font-bold': mov.tipo === 'entrada',
+              'text-red-600 font-bold': mov.tipo === 'salida',
+              'text-blue-600 font-bold': mov.tipo === 'ajuste'
+            }">
+              {{ mov.tipo.charAt(0).toUpperCase() + mov.tipo.slice(1) }}
+            </span>
+          </td>
           <td class="px-2 py-1">{{ mov.cantidad }}</td>
+          <td class="px-2 py-1">{{ mov.Proveedor?.nombre || '-' }}</td>
           <td class="px-2 py-1">{{ mov.Usuario?.nombre || 'N/A' }}</td>
           <td class="px-2 py-1">{{ mov.observaciones || '-' }}</td>
         </tr>
@@ -35,7 +45,20 @@ const props = defineProps({
   }
 })
 
-const { data: movimientos = [], pending, error } = await useFetch(`http://localhost:4000/api/movimientos/producto/${props.idProducto}`, {
-  default: () => []
+const movimientos = ref([])
+const pending = ref(true)
+const error = ref(null)
+
+onMounted(async () => {
+  try {
+    const token = localStorage.getItem('token')
+    movimientos.value = await $fetch(`http://localhost:4000/api/movimientos/producto/${props.idProducto}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  } catch (e) {
+    error.value = e
+  } finally {
+    pending.value = false
+  }
 })
 </script>

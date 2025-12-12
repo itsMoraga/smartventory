@@ -8,6 +8,8 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const photoRoutes = require('./routes/photoRoutes');
 const path = require('path');
 const movimientosRoutes = require('./routes/movimientosRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const proveedorRoutes = require('./routes/proveedorRoutes');
 
 dotenv.config();
 const app = express();
@@ -24,6 +26,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/photos', photoRoutes);
 app.use('/api/movimientos', movimientosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/proveedores', proveedorRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.send('🚀 Servidor Smartventory funcionando correctamente'));
